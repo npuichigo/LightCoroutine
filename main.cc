@@ -21,6 +21,13 @@ Task<int> Foo() {
   std::cout << "Bar value: " << value << std::endl;
   value++;
   co_return value;
+}
+
+int main() {
+  auto t = Foo();
+  t.Resume();
+  std::cout << "Foo value: " << t.Result() << std::endl;
+  return 0;
 }*/
 
 #include <chrono>
@@ -28,7 +35,6 @@ Task<int> Foo() {
 #include <string>
 #include <thread>
 
-#include "core/sync_wait_task.h"
 #include "core/task.h"
 
 using std::chrono::high_resolution_clock;
@@ -68,14 +74,7 @@ int main() {
   std::cout << std::endl;
   auto start = high_resolution_clock::now();
   auto task = first(start);
-  SyncWait(task);
+  task.Wait();
   std::cout << "Main waited " <<  getTimeSince(start) << " seconds." << std::endl;
   std::cout << std::endl;
 }
-
-/*int main() {
-  auto t = Foo();
-  auto value = SyncWait(t);
-  std::cout << "Foo value: " << value << std::endl;
-  return 0;
-}*/

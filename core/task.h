@@ -20,9 +20,6 @@
 #include <variant>
 #include <experimental/coroutine>
 
-#include "core/completion_notifier.h"
-#include "core/sync_wait_task.h"
-
 namespace light_coro {
 
 using std::experimental::coroutine_handle;
@@ -38,9 +35,10 @@ class TaskPromiseBase {
   struct FinalAwaitable {
     bool await_ready() noexcept { return false; }
     template <typename PROMISE>
-    coroutine_handle<> await_suspend(
-        coroutine_handle<PROMISE> coroutine) noexcept {
-      return coroutine.promise().continuation_;
+    void await_suspend(coroutine_handle<PROMISE> coroutine) noexcept {
+      auto& p = coroutine.promise();
+      if (p.continuation_)
+        p.continuation_.resume();
     }
     void await_resume() noexcept {}
   };
@@ -153,9 +151,9 @@ class [[nodiscard]] Task {
       return !coroutine || coroutine.done();
     }
 
-    coroutine_handle<> await_suspend(coroutine_handle<> caller_coroutine) {
+    void await_suspend(coroutine_handle<> caller_coroutine) {
       coroutine.promise().set_continuation(caller_coroutine);
-      return coroutine;
+      coroutine.resume();
     }
 
     coroutine_handle<promise_type> coroutine;
@@ -222,6 +220,14 @@ class [[nodiscard]] Task {
       auto await_resume() {}
     };
     return Awaiter{coroutine_};
+  }
+
+  void Wait() noexcept {
+    coroutine_.resume();
+  }
+
+  auto Result() {
+    return coroutine_.promise().result();
   }
 
  private:
