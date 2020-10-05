@@ -1,34 +1,18 @@
-/*#include <iostream>
-
-#include "core/sync_wait_task.h"
-#include "core/task.h"
-
-using namespace light_coro;
-
-Task<int> Baz() {
-  co_return 0;
-}
-
-Task<int> Bar() {
-  int value = co_await Baz();
-  std::cout << "Baz value: " << value << std::endl;
-  value++;
-  co_return value;
-}
-
-Task<int> Foo() {
-  int value = co_await Bar();
-  std::cout << "Bar value: " << value << std::endl;
-  value++;
-  co_return value;
-}
-
-int main() {
-  auto t = Foo();
-  t.Resume();
-  std::cout << "Foo value: " << t.Result() << std::endl;
-  return 0;
-}*/
+// Copyright 2020 Babble Authors. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Author: npuichigo@gmail.com (zhangyuchao)
 
 #include <chrono>
 #include <iostream>
