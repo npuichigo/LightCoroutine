@@ -36,7 +36,12 @@ auto getTimeSince(const time_point<high_resolution_clock>& start) {
 }
 
 Task<> third(const time_point<high_resolution_clock>& start) {
-  co_await async([] { std::this_thread::sleep_for(1s); });
+  auto fut = async([] {
+    std::this_thread::sleep_for(1s);
+    std::cout << "Async job finished" << std::endl;
+  });
+  std::this_thread::sleep_for(2s);
+  co_await fut;
   std::cout << "Third waited " << getTimeSince(start) << " seconds." << std::endl;
   co_return;
 }
@@ -61,5 +66,4 @@ int main() {
   auto task = first(start);
   task.Wait();
   std::cout << "Main waited " <<  getTimeSince(start) << " seconds." << std::endl;
-  std::cout << std::endl;
 }
