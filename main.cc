@@ -36,12 +36,12 @@ auto getTimeSince(const time_point<high_resolution_clock>& start) {
 }
 
 Task<> third(const time_point<high_resolution_clock>& start) {
-  auto fut = async([] {
+  auto future = async([&] {
     std::this_thread::sleep_for(1s);
-    std::cout << "Async job finished" << std::endl;
+    std::cout << "Async job finished in " << getTimeSince(start) << " seconds." << std::endl;
   });
   std::this_thread::sleep_for(2s);
-  co_await fut;
+  co_await future;
   std::cout << "Third waited " << getTimeSince(start) << " seconds." << std::endl;
   co_return;
 }
