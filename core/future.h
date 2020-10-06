@@ -34,14 +34,33 @@ struct Future : std::future<T> {
   using std::future<T>::wait;
   using std::future<T>::wait_for;
 
+  struct promise_type {
+    std::promise<T> promise_;
+    Future<T> get_return_object() {
+      return promise_.get_future();
+    }
+
+    auto initial_suspend() noexcept { return suspend_never(); }
+    auto final_suspend() noexcept { return suspend_never(); }
+
+    template <typename U>
+    void return_value(U&& value) noexcept {
+      promise_.set_value(std::forward<U>(value));
+    }
+
+    void unhandled_exception() noexcept {
+      promise_.set_exception(std::current_exception());
+    }
+  };
+
   Future(std::future<T>&& fut) : std::future<T>(std::move(fut)) {}
 
-  bool await_ready() {
+  bool await_ready() const noexcept {
     return wait_for(std::chrono::seconds(0)) ==
         std::future_status::ready;
   }
 
-  void await_suspend(coroutine_handle<> handle) {
+  void await_suspend(coroutine_handle<> handle) noexcept {
     wait();
     handle.resume();
   }
@@ -49,25 +68,6 @@ struct Future : std::future<T> {
   auto await_resume() {
     return get();
   }
-
-  struct promise_type {
-    std::promise<T> promise_;
-    Future<T> get_return_object() {
-      return promise_.get_future();
-    }
-
-    auto initial_suspend() { return suspend_never(); }
-    auto final_suspend() { return suspend_never(); }
-
-    template <typename U>
-    void return_value(U&& value) {
-      promise_.set_value(std::forward<U>(value));
-    }
-
-    void unhandled_exception() {
-      promise_.set_exception(std::current_exception());
-    }
-  };
 };
 
 template <typename T>

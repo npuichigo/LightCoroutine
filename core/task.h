@@ -151,7 +151,7 @@ class [[nodiscard]] Task {
       return !coroutine || coroutine.done();
     }
 
-    void await_suspend(coroutine_handle<> caller_coroutine) {
+    void await_suspend(coroutine_handle<> caller_coroutine) noexcept {
       coroutine.promise().set_continuation(caller_coroutine);
       coroutine.resume();
     }
