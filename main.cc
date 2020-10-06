@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 
+#include "core/future.h"
 #include "core/task.h"
 
 using std::chrono::high_resolution_clock;
@@ -35,7 +36,7 @@ auto getTimeSince(const time_point<high_resolution_clock>& start) {
 }
 
 Task<> third(const time_point<high_resolution_clock>& start) {
-  std::this_thread::sleep_for(1s);
+  co_await async([] { std::this_thread::sleep_for(1s); });
   std::cout << "Third waited " << getTimeSince(start) << " seconds." << std::endl;
   co_return;
 }

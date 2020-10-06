@@ -6,4 +6,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -stdlib=libc++ -fcoroutines-t
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_executable(main core/task.h main.cc)
+add_executable(main core/task.h core/future.h main.cc)
