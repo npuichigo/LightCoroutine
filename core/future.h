@@ -29,11 +29,7 @@ using std::experimental::coroutine_handle;
 using std::experimental::suspend_never;
 
 template <typename T>
-struct Future : std::future<T> {
-  using std::future<T>::get;
-  using std::future<T>::wait;
-  using std::future<T>::wait_for;
-
+class Future : std::future<T> {
   struct promise_type {
     std::promise<T> promise_;
     Future<T> get_return_object() {
@@ -52,6 +48,11 @@ struct Future : std::future<T> {
       promise_.set_exception(std::current_exception());
     }
   };
+
+ public:
+  using std::future<T>::get;
+  using std::future<T>::wait;
+  using std::future<T>::wait_for;
 
   Future(std::future<T>&& fut) : std::future<T>(std::move(fut)) {}
 
