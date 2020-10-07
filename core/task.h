@@ -17,6 +17,7 @@
 #ifndef LIGHTCOROUTINE_TASK_H_
 #define LIGHTCOROUTINE_TASK_H_
 
+#include <functional>
 #include <variant>
 #include <experimental/coroutine>
 
@@ -228,6 +229,12 @@ class [[nodiscard]] Task {
 
   auto Result() {
     return coroutine_.promise().result();
+  }
+
+  template <typename Scheduler, typename Function, typename ...Args>
+  static Task<T> Run(Scheduler& scheduler, Function&& f, Args&&... args) {
+    co_await scheduler.Schedule();
+    co_return std::invoke(f, std::forward<Args>(args)...);
   }
 
  private:

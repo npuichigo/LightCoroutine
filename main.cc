@@ -21,6 +21,7 @@
 
 #include "core/future.h"
 #include "core/task.h"
+#include "core/inline_scheduler.h"
 
 using std::chrono::high_resolution_clock;
 using std::chrono::time_point;
@@ -48,7 +49,10 @@ Task<> third(const time_point<high_resolution_clock>& start) {
 
 Task<> second(const time_point<high_resolution_clock>& start) {
   auto thi = third(start);
+  auto scheduler = InlineScheduler();
+  auto another_task = Task<>::Run(scheduler, []() { std::cout << "Another task" << std::endl; });
   co_await thi;
+  co_await another_task;
   std::this_thread::sleep_for(1s);
   std::cout << "Second waited " <<  getTimeSince(start) << " seconds." << std::endl;
 }
@@ -61,7 +65,6 @@ Task<> first(const time_point<high_resolution_clock>& start) {
 }
 
 int main() {
-  std::cout << std::endl;
   auto start = high_resolution_clock::now();
   auto task = first(start);
   task.Wait();
